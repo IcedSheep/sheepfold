@@ -1,13 +1,16 @@
 package com.sheep.sheepfold.controller;
 
+import com.sheep.sheepfold.annotation.AuthCheck;
 import com.sheep.sheepfold.common.ApiResponse;
 import com.sheep.sheepfold.common.ErrorCode;
 import com.sheep.sheepfold.common.ResultUtils;
+import com.sheep.sheepfold.constant.UserConstant;
 import com.sheep.sheepfold.exception.BusinessException;
 import com.sheep.sheepfold.model.User;
 import com.sheep.sheepfold.model.dto.UserLoginDTO;
 import com.sheep.sheepfold.model.dto.UserLoginVO;
 import com.sheep.sheepfold.model.dto.UserRegisterDTO;
+import com.sheep.sheepfold.model.enums.UserRoleEnum;
 import com.sheep.sheepfold.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
