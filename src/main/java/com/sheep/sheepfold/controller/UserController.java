@@ -4,6 +4,7 @@ import com.sheep.sheepfold.common.ApiResponse;
 import com.sheep.sheepfold.common.ErrorCode;
 import com.sheep.sheepfold.common.ResultUtils;
 import com.sheep.sheepfold.exception.BusinessException;
+import com.sheep.sheepfold.model.User;
 import com.sheep.sheepfold.model.dto.UserLoginDTO;
 import com.sheep.sheepfold.model.dto.UserLoginVO;
 import com.sheep.sheepfold.model.dto.UserRegisterDTO;
@@ -55,5 +56,17 @@ public class UserController {
         }
         UserLoginVO loginUserVO = userService.userLogin(email, userPassword, request);
         return ResultUtils.success(loginUserVO);
+    }
+
+    /**
+     * 获取当前登录用户
+     *
+     * @param request
+     * @return
+     */
+    @GetMapping("/get/login")
+    public ApiResponse<UserLoginVO> getLoginUser(HttpServletRequest request) {
+        User user = userService.getLoginUser(request);
+        return ResultUtils.success(userService.getLoginUserVO(user));
     }
 }
