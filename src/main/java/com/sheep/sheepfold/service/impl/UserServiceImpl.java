@@ -2,6 +2,7 @@ package com.sheep.sheepfold.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sheep.sheepfold.common.ErrorCode;
@@ -9,12 +10,14 @@ import com.sheep.sheepfold.exception.BusinessException;
 import com.sheep.sheepfold.manager.UserAccountGenerator;
 import com.sheep.sheepfold.mapper.UserMapper;
 import com.sheep.sheepfold.model.User;
+import com.sheep.sheepfold.model.dto.UserLoginVO;
 import com.sheep.sheepfold.model.dto.UserRegisterDTO;
 import com.sheep.sheepfold.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -25,6 +28,7 @@ import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -36,6 +40,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     implements UserService{
 
     private static final String SALT = "sheep";
+
+    private static final String USER_LOGIN_STATE = "user_login";
 
 
     @Autowired
@@ -178,6 +184,45 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
     }
 
+    @Override
+    public UserLoginVO userLogin(String email, String userPassword, HttpServletRequest request) {
+        // 1. 校验
+        if (StringUtils.isAnyBlank(email, userPassword)) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
+        }
+        EmailValidator validator = EmailValidator.getInstance();
+        if (!validator.isValid(email)) {
+            log.error("错误邮箱：{}",email);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR,"错误邮箱");
+        }
+        if (userPassword.length() < 6) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码错误");
+        }
+        // 2. 加密
+        String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
+        // 查询用户是否存在
+        LambdaQueryWrapper<User> lambdaQueryWrapper = Wrappers.lambdaQuery(User.class)
+                .eq(User::getUserEmail, email)
+                .eq(User::getUserPassword, encryptPassword);
+        User user = this.baseMapper.selectOne(lambdaQueryWrapper);
+        // 用户不存在
+        if (user == null) {
+            log.info("user login failed, userAccount cannot match userPassword");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户不存在或密码错误");
+        }
+        // 3. 记录用户的登录态
+        request.getSession().setAttribute(USER_LOGIN_STATE, user);
+        return this.getLoginUserVO(user);
+    }
+
+    public UserLoginVO getLoginUserVO(User user) {
+        if (user == null) {
+            return null;
+        }
+        UserLoginVO loginUserVO = new UserLoginVO();
+        BeanUtils.copyProperties(user, loginUserVO);
+        return loginUserVO;
+    }
 
 
 }

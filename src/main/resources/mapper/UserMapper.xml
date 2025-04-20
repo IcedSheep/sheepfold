@@ -12,6 +12,7 @@
             <result property="userName" column="user_name" jdbcType="VARCHAR"/>
             <result property="gender" column="gender" jdbcType="TINYINT"/>
             <result property="userAvatar" column="user_avatar" jdbcType="VARCHAR"/>
+            <result property="userProfile" column="user_profile" jdbcType="VARCHAR"/>
             <result property="userRole" column="user_role" jdbcType="VARCHAR"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
             <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
@@ -21,7 +22,7 @@
     <sql id="Base_Column_List">
         id,user_account,user_password,
         user_email,user_name,gender,
-        user_avatar,user_role,create_time,
+        user_avatar,user_role,create_time,user_profile,
         update_time,del_flag
     </sql>
 </mapper>

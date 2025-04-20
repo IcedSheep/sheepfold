@@ -1,33 +1,25 @@
-package com.sheep.sheepfold.model;
+package com.sheep.sheepfold.model.dto;
 
-import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * 用户
- * @TableName user
  */
-@TableName(value ="user")
 @Data
-public class User implements Serializable {
+public class UserLoginVO implements Serializable {
     /**
      * id
      */
-    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
-     * 用户id
+     * 用户账号
      */
     private String userAccount;
 
-    /**
-     * 密码
-     */
-    private String userPassword;
 
     /**
      * 邮箱
@@ -50,14 +42,14 @@ public class User implements Serializable {
     private String userAvatar;
 
     /**
-     * 用户角色：user/admin
-     */
-    private String userRole;
-
-    /**
      * 个人简介
      */
     private String userProfile;
+
+    /**
+     * 用户角色：user/admin
+     */
+    private String userRole;
 
     /**
      * 创建时间
@@ -69,12 +61,4 @@ public class User implements Serializable {
      */
     private Date updateTime;
 
-    /**
-     * 是否删除
-     */
-    @TableLogic
-    private Integer delFlag;
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
 }
