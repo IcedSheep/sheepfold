@@ -1,19 +1,20 @@
 package com.sheep.sheepfold.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sheep.sheepfold.annotation.AuthCheck;
 import com.sheep.sheepfold.common.ApiResponse;
 import com.sheep.sheepfold.common.ErrorCode;
 import com.sheep.sheepfold.common.ResultUtils;
 import com.sheep.sheepfold.constant.UserConstant;
 import com.sheep.sheepfold.exception.BusinessException;
+import com.sheep.sheepfold.exception.ThrowUtils;
 import com.sheep.sheepfold.model.User;
-import com.sheep.sheepfold.model.dto.UserLoginDTO;
-import com.sheep.sheepfold.model.dto.UserLoginVO;
-import com.sheep.sheepfold.model.dto.UserRegisterDTO;
-import com.sheep.sheepfold.model.enums.UserRoleEnum;
+import com.sheep.sheepfold.model.dto.*;
 import com.sheep.sheepfold.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -86,5 +87,45 @@ public class UserController {
         }
         boolean result = userService.userLogout(request);
         return ResultUtils.success(result);
+    }
+
+    /**
+     * 分页获取用户列表（仅管理员）
+     *
+     * @param userQueryRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/list/page")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public ApiResponse<Page<User>> listUserByPage(@RequestBody UserQueryDTO userQueryRequest,
+                                                   HttpServletRequest request) {
+        long current = userQueryRequest.getCurrent();
+        long size = userQueryRequest.getPageSize();
+        QueryWrapper<User> queryWrapper = userService.getQueryWrapper(userQueryRequest);
+        Page<User> userPage = userService.page(new Page<>(current, size),queryWrapper);
+        return ResultUtils.success(userPage);
+    }
+
+    /**
+     * 更新个人信息
+     *
+     * @param userUpdateMyRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/update/my")
+    public ApiResponse<Boolean> updateMyUser(@RequestBody UserUpdateMyDTO userUpdateMyRequest,
+                                              HttpServletRequest request) {
+        if (userUpdateMyRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+        User user = new User();
+        BeanUtils.copyProperties(userUpdateMyRequest, user);
+        user.setId(loginUser.getId());
+        boolean result = userService.updateById(user);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        return ResultUtils.success(true);
     }
 }

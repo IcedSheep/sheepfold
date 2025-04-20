@@ -1,8 +1,10 @@
 package com.sheep.sheepfold.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.sheep.sheepfold.model.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.sheep.sheepfold.model.dto.UserLoginVO;
+import com.sheep.sheepfold.model.dto.UserQueryDTO;
 import com.sheep.sheepfold.model.dto.UserRegisterDTO;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,4 +25,6 @@ public interface UserService extends IService<User> {
     User getLoginUser(HttpServletRequest request);
 
     boolean userLogout(HttpServletRequest request);
+
+    QueryWrapper<User> getQueryWrapper(UserQueryDTO userQueryRequest);
 }

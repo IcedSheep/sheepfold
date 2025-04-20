@@ -2,16 +2,20 @@ package com.sheep.sheepfold.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sheep.sheepfold.common.ErrorCode;
+import com.sheep.sheepfold.constant.CommonConstant;
 import com.sheep.sheepfold.exception.BusinessException;
 import com.sheep.sheepfold.manager.UserAccountGenerator;
 import com.sheep.sheepfold.mapper.UserMapper;
 import com.sheep.sheepfold.model.User;
 import com.sheep.sheepfold.model.dto.UserLoginVO;
+import com.sheep.sheepfold.model.dto.UserQueryDTO;
 import com.sheep.sheepfold.model.dto.UserRegisterDTO;
 import com.sheep.sheepfold.service.UserService;
+import com.sheep.sheepfold.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -262,7 +266,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return true;
     }
 
+    @Override
+    public QueryWrapper<User> getQueryWrapper(UserQueryDTO userQueryRequest) {
+        if (userQueryRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
+        }
+        Long id = userQueryRequest.getId();
+        String userAccount = userQueryRequest.getUserAccount();
+        String userEmail = userQueryRequest.getUserEmail();
+        Integer gender = userQueryRequest.getGender();
+        String userName = userQueryRequest.getUserName();
+        String userProfile = userQueryRequest.getUserProfile();
+        String userRole = userQueryRequest.getUserRole();
+        String sortField = userQueryRequest.getSortField();
+        String sortOrder = userQueryRequest.getSortOrder();
 
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(id != null, "id", id);
+        queryWrapper.eq(StringUtils.isNotBlank(userRole), "user_role", userRole);
+        queryWrapper.eq(StringUtils.isNotBlank(userRole), "user_account", userAccount);
+        queryWrapper.eq(StringUtils.isNotBlank(userRole), "user_email", userEmail);
+        queryWrapper.eq(StringUtils.isNotBlank(userRole), "gender", gender);
+        queryWrapper.like(StringUtils.isNotBlank(userProfile), "user_profile", userProfile);
+        queryWrapper.like(StringUtils.isNotBlank(userName), "user_name", userName);
+        queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
+                sortField);
+        return queryWrapper;
+    }
 }
 
 
