@@ -9,11 +9,10 @@ import com.sheep.sheepfold.common.ResultUtils;
 import com.sheep.sheepfold.constant.UserConstant;
 import com.sheep.sheepfold.exception.BusinessException;
 import com.sheep.sheepfold.exception.ThrowUtils;
+import com.sheep.sheepfold.model.dto.user.*;
 import com.sheep.sheepfold.model.User;
-import com.sheep.sheepfold.model.dto.*;
 import com.sheep.sheepfold.service.UserService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +35,7 @@ public class UserController {
     }
 
     @GetMapping("getCode")
-    public ApiResponse<String> getCode(@Param("email") String email) {
+    public ApiResponse<String> getCode(@RequestParam("userEmail") String email) {
         String code = userService.getCode(email);
         return ResultUtils.success(code);
     }

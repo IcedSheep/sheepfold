@@ -1,4 +1,4 @@
-package com.sheep.sheepfold.model.dto;
+package com.sheep.sheepfold.model.dto.user;
 import com.sheep.sheepfold.common.PageRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

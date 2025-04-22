@@ -11,9 +11,9 @@ import com.sheep.sheepfold.exception.BusinessException;
 import com.sheep.sheepfold.manager.UserAccountGenerator;
 import com.sheep.sheepfold.mapper.UserMapper;
 import com.sheep.sheepfold.model.User;
-import com.sheep.sheepfold.model.dto.UserLoginVO;
-import com.sheep.sheepfold.model.dto.UserQueryDTO;
-import com.sheep.sheepfold.model.dto.UserRegisterDTO;
+import com.sheep.sheepfold.model.dto.user.UserLoginVO;
+import com.sheep.sheepfold.model.dto.user.UserQueryDTO;
+import com.sheep.sheepfold.model.dto.user.UserRegisterDTO;
 import com.sheep.sheepfold.service.UserService;
 import com.sheep.sheepfold.utils.SqlUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +35,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import static com.sheep.sheepfold.constant.UserConstant.USER_LOGIN_STATE;
+
 /**
 */
 @Service
@@ -44,7 +46,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     private static final String SALT = "sheep";
 
-    private static final String USER_LOGIN_STATE = "user_login";
+
 
 
     @Autowired
